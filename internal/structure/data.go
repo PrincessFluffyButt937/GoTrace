@@ -1,6 +1,9 @@
 package structure
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+	"time"
+)
 
 //raw XML data structure
 
@@ -58,3 +61,16 @@ type TraceabilityData struct {
 //trace: ID, SN, HU, ref-list, time-finish
 //board: ID, SN (unique), project, project rev
 //comp: ID, HU (unique), PN, lotcode
+
+type ParsedXML struct {
+	SerialNumber string
+	Project      string
+	Revision     string
+	Component    []struct {
+		PartNumber   string
+		HandlingUnit string
+		LotCode      string
+		PlacedIn     time.Time
+		RefereceList []string
+	}
+}

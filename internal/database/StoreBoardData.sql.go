@@ -9,7 +9,7 @@ import (
 	"context"
 )
 
-const storeBoardData = `-- name: StoreBoardData :exec
+const storeBoardData = `-- name: StoreBoardData :one
 INSERT INTO boards (sn, pb, rev)
 VALUES (
     ?, ?, ?
@@ -23,7 +23,9 @@ type StoreBoardDataParams struct {
 	Rev string
 }
 
-func (q *Queries) StoreBoardData(ctx context.Context, arg StoreBoardDataParams) error {
-	_, err := q.db.ExecContext(ctx, storeBoardData, arg.Sn, arg.Pb, arg.Rev)
-	return err
+func (q *Queries) StoreBoardData(ctx context.Context, arg StoreBoardDataParams) (Board, error) {
+	row := q.db.QueryRowContext(ctx, storeBoardData, arg.Sn, arg.Pb, arg.Rev)
+	var i Board
+	err := row.Scan(&i.Sn, &i.Pb, &i.Rev)
+	return i, err
 }

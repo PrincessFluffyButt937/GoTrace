@@ -9,7 +9,7 @@ import (
 	"context"
 )
 
-const storeCompData = `-- name: StoreCompData :exec
+const storeCompData = `-- name: StoreCompData :one
 INSERT INTO comps (hu, pn, lot)
 VALUES (
     ?, ?, ?
@@ -23,7 +23,9 @@ type StoreCompDataParams struct {
 	Lot string
 }
 
-func (q *Queries) StoreCompData(ctx context.Context, arg StoreCompDataParams) error {
-	_, err := q.db.ExecContext(ctx, storeCompData, arg.Hu, arg.Pn, arg.Lot)
-	return err
+func (q *Queries) StoreCompData(ctx context.Context, arg StoreCompDataParams) (Comp, error) {
+	row := q.db.QueryRowContext(ctx, storeCompData, arg.Hu, arg.Pn, arg.Lot)
+	var i Comp
+	err := row.Scan(&i.Hu, &i.Pn, &i.Lot)
+	return i, err
 }

@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const storeTraceData = `-- name: StoreTraceData :exec
+const storeTraceData = `-- name: StoreTraceData :one
 INSERT INTO traces (sn, hu, ref_list, placed)
 VALUES (
     ?, ?, ?, ?
@@ -25,12 +25,20 @@ type StoreTraceDataParams struct {
 	Placed  time.Time
 }
 
-func (q *Queries) StoreTraceData(ctx context.Context, arg StoreTraceDataParams) error {
-	_, err := q.db.ExecContext(ctx, storeTraceData,
+func (q *Queries) StoreTraceData(ctx context.Context, arg StoreTraceDataParams) (Trace, error) {
+	row := q.db.QueryRowContext(ctx, storeTraceData,
 		arg.Sn,
 		arg.Hu,
 		arg.RefList,
 		arg.Placed,
 	)
-	return err
+	var i Trace
+	err := row.Scan(
+		&i.ID,
+		&i.Sn,
+		&i.Hu,
+		&i.RefList,
+		&i.Placed,
+	)
+	return i, err
 }

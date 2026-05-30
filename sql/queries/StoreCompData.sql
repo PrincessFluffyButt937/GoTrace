@@ -1,4 +1,4 @@
--- name: StoreCompData :exec
+-- name: StoreCompData :one
 INSERT INTO comps (hu, pn, lot)
 VALUES (
     ?, ?, ?
