@@ -62,7 +62,7 @@ type TraceabilityData struct {
 //board: ID, SN (unique), project, project rev
 //comp: ID, HU (unique), PN, lotcode
 
-type ParsedXML struct {
+type FormatedXMLdata struct {
 	SerialNumber string
 	Project      string
 	Revision     string
