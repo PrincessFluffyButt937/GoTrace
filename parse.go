@@ -105,9 +105,9 @@ func parseStringToProjectRevision(dataInput projectDataInput) (projectData, erro
 	filenameSplit := strings.Split(dataInput.fileName, "-")
 	if len(filenameSplit) == 7 {
 		projectAndRev := filenameSplit[1]
-		if len(projectAndRev) == 10 && strings.HasPrefix(strings.ToLower(projectAndRev), "pb") {
+		if len(projectAndRev) == 11 && strings.HasPrefix(strings.ToLower(projectAndRev), "pb") {
 			project := projectAndRev[:9]
-			revison := projectAndRev[9:]
+			revison := projectAndRev[10:]
 			data.Project = project
 			data.Revision = revison
 			data.Side = "N/A"
