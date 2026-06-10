@@ -150,7 +150,55 @@ func parseXML(XMLFilePath string) (structure.TraceabilityData, error) {
 	return data, nil
 }
 
-func formatTraceData(inputData structure.TraceabilityData) (structure.FormatedXMLdata, error) {
-	//to be implemented
-	return structure.FormatedXMLdata{}, nil
+func formatTraceData(inputData structure.TraceabilityData, filename string) (structure.FormatedXMLdata, error) {
+	//project data conversion
+	slicedProgName := strings.Split(inputData.Job, "\\")
+	inputProgramName := slicedProgName[len(slicedProgName)-1]
+	projectInput := projectDataInput{
+		fileName:    filename,
+		panelName:   inputData.Panel.Name,
+		programName: inputProgramName,
+	}
+	projectDataSet, err := parseStringToProjectRevision(projectInput)
+	if err != nil {
+		return structure.FormatedXMLdata{}, err
+	}
+
+	moutedDateTime, err := parseStringToTime(inputData.DateComplete)
+	if err != nil {
+		return structure.FormatedXMLdata{}, err
+	}
+	//time data conversion
+
+	tempChargeRefrerece := map[string][]string{}
+
+	for _, panelEntry := range inputData.Panel.Ref {
+		tempChargeRefrerece[panelEntry.ID] = panelEntry.RefDes
+	}
+
+	var traceData []structure.ComponentData
+
+	for _, compData := range inputData.Charge {
+		references, ok := tempChargeRefrerece[compData.ID]
+		if !ok {
+			continue
+		}
+		trace := structure.ComponentData{
+			PartNumber:   compData.Comp,
+			HandlingUnit: compData.Barc6,
+			LotCode:      compData.Barc2,
+			RefereceList: references,
+		}
+		traceData = append(traceData, trace)
+	}
+
+	outData := structure.FormatedXMLdata{
+		SerialNumber: inputData.BoardID,
+		Project:      projectDataSet.Project,
+		Revision:     projectDataSet.Revision,
+		PlacedIn:     moutedDateTime,
+		Components:   traceData,
+	}
+
+	return outData, nil
 }
