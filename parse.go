@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/PrincessFluffyButt937/GoTrace/internal/structure"
 )
@@ -201,4 +203,44 @@ func formatTraceData(inputData structure.TraceabilityData, filename string) (str
 	}
 
 	return outData, nil
+}
+
+func refSortKey(referece string) string {
+	prefixSeparatorIndex := 0
+	prefixFound := false
+	key := ""
+	for i := 0; i < len(referece); i++ {
+		letter := referece[i]
+		if unicode.IsLetter(rune(letter)) {
+			if !prefixFound {
+				prefixSeparatorIndex = i
+				continue
+			}
+			if unicode.IsDigit(rune(letter)) {
+				if !prefixFound {
+					prefixFound = true
+				}
+			}
+		}
+		key = referece[prefixSeparatorIndex+1:]
+		for len(key) < 6 {
+			key = "0" + key
+		}
+	}
+	return key
+}
+
+func refListToString(refList []string, order bool) string {
+	if order {
+		temp := refList
+		sort.Slice(temp, func(i, j int) bool {
+			low := refSortKey(temp[i])
+			high := refSortKey(temp[j])
+			return low < high
+		})
+		sortedRefString := strings.Join(temp, ", ")
+		return sortedRefString
+	}
+	refString := strings.Join(refList, ", ")
+	return refString
 }
