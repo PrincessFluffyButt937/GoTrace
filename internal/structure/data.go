@@ -66,11 +66,13 @@ type FormatedXMLdata struct {
 	SerialNumber string
 	Project      string
 	Revision     string
-	Component    []struct {
-		PartNumber   string
-		HandlingUnit string
-		LotCode      string
-		PlacedIn     time.Time
-		RefereceList []string
-	}
+	PlacedIn     time.Time
+	Components   []ComponentData
+}
+
+type ComponentData struct {
+	PartNumber   string
+	HandlingUnit string
+	LotCode      string
+	RefereceList []string
 }
