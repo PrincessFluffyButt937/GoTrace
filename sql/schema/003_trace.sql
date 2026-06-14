@@ -4,7 +4,8 @@ CREATE TABLE traces (
     sn TEXT NOT NULL REFERENCES boards(sn),
     hu TEXT NOT NULL REFERENCES comps(hu),
     ref_list TEXT NOT NULL,
-    placed TIMESTAMP NOT NULL
+    placed TIMESTAMP NOT NULL,
+    CONSTRAINT trace_duplicate UNIQUE (sn, hu, ref_list)
 );
 
 -- +goose Down

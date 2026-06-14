@@ -14,7 +14,6 @@ type UniversalCache struct {
 }
 
 type UniCacheNode struct {
-	entry  string
 	before *UniCacheNode
 	after  *UniCacheNode
 }
@@ -39,15 +38,16 @@ func InitCache(SNsize, HUsize int) *Cache {
 }
 
 func (cache *UniversalCache) DelLastNode(entry string) {
-	cache.last = cache.last.before
-	cache.last.after = nil
+	newLastNode := cache.last.before
+	newLastNode.after = nil
+	cache.last.before = nil
+	cache.last = newLastNode
 	delete(cache.hashmap, entry)
 }
 
 func (cache *UniversalCache) Add(entry string) {
-	newEntry := UniCacheNode{
-		entry: entry,
-	}
+	newEntry := UniCacheNode{}
+
 	switch cache.entryCount {
 	case 0:
 		cache.first = &newEntry
@@ -55,8 +55,8 @@ func (cache *UniversalCache) Add(entry string) {
 		cache.hashmap[entry] = &newEntry
 	case 1:
 		cache.first = &newEntry
-		newEntry.after = cache.last
-		cache.last.before = &newEntry
+		cache.first.after = cache.last
+		cache.last.before = cache.first
 		cache.hashmap[entry] = &newEntry
 	default:
 		newEntry.after = cache.first
@@ -69,4 +69,46 @@ func (cache *UniversalCache) Add(entry string) {
 		}
 	}
 	cache.entryCount++
+}
+
+func (cache *UniversalCache) Contains(entry string) bool {
+	cacheEntry, ok := cache.hashmap[entry]
+	if !ok {
+		cache.Add(entry)
+		return false
+	}
+	if cacheEntry == cache.first {
+		return true
+	}
+	if cacheEntry == cache.last {
+		cache.last = cache.last.before
+		cache.last.after = nil
+
+		cacheEntry.before = nil
+		cacheEntry.after = cache.first
+		cache.first = cacheEntry
+		return true
+	}
+	//reorder cacheNodes
+	tempBefore := cacheEntry.before
+	tempAfter := cacheEntry.after
+
+	tempBefore.after = tempAfter
+	tempAfter.before = tempBefore
+
+	cache.first.before = cacheEntry
+	cacheEntry.before = nil
+	cacheEntry.after = cache.first
+	cache.first = cacheEntry
+	return true
+}
+
+func (cache *UniversalCache) Clear() {
+	for _, node := range cache.hashmap {
+		node.before = nil
+		node.after = nil
+	}
+	cache.first = nil
+	cache.last = nil
+	clear(cache.hashmap)
 }
