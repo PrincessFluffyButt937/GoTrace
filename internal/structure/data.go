@@ -76,3 +76,37 @@ type ComponentData struct {
 	LotCode      string
 	RefereceList []string
 }
+
+//Full SN traceablility
+
+type DatabaseSerialData struct {
+	SerialNumber string
+	Project      string
+	Revision     string
+	PlacedIn     time.Time
+	Components   []DatabaseComponentData
+}
+
+type DatabaseComponentData struct {
+	PartNumber   string
+	HandlingUnit string
+	LotCode      string
+	RefereceList string
+}
+
+//HU traceability only
+
+type DatabaseHandlingData struct {
+	PartNumber    string
+	HandlingUnit  string
+	LotCode       string
+	SerialNumbers []DatabaseHandlingSerialMatch
+}
+
+type DatabaseHandlingSerialMatch struct {
+	SerialNumber string
+	Project      string
+	Revision     string
+	PlacedIn     time.Time
+	RefereceList string
+}
