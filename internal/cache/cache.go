@@ -19,6 +19,7 @@ type UniversalCache struct {
 }
 
 type UniCacheNode struct {
+	key    string
 	before *UniCacheNode
 	after  *UniCacheNode
 }
@@ -59,7 +60,9 @@ func (cache *UniversalCache) DelLastNode(entry string) {
 }
 
 func (cache *UniversalCache) Add(entry string) {
-	newEntry := UniCacheNode{}
+	newEntry := UniCacheNode{
+		key: entry,
+	}
 
 	switch cache.entryCount {
 	case 0:
@@ -77,8 +80,7 @@ func (cache *UniversalCache) Add(entry string) {
 		cache.first = &newEntry
 		cache.hashmap[entry] = &newEntry
 		if cache.casheSize == cache.entryCount {
-			//bug - new entry is deleted as the last
-			cache.DelLastNode(entry)
+			cache.DelLastNode(cache.last.key)
 			cache.entryCount--
 		}
 	}
@@ -139,6 +141,7 @@ type FileCache struct {
 }
 
 type FileCacheNode struct {
+	key    string
 	before *FileCacheNode
 	after  *FileCacheNode
 	files  map[string]struct{}
@@ -155,6 +158,7 @@ func (cache *FileCache) DelLastNode(entry string) {
 
 func (cache *FileCache) Add(entry, fileName string) {
 	newEntry := FileCacheNode{
+		key:   entry,
 		files: make(map[string]struct{}),
 	}
 	newEntry.files[fileName] = struct{}{}
@@ -175,8 +179,7 @@ func (cache *FileCache) Add(entry, fileName string) {
 		cache.first = &newEntry
 		cache.hashmap[entry] = &newEntry
 		if cache.casheSize == cache.entryCount {
-			//bug - new entry is deleted as the last
-			cache.DelLastNode(entry)
+			cache.DelLastNode(cache.last.key)
 			cache.entryCount--
 		}
 	}
