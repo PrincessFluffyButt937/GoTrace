@@ -156,6 +156,37 @@ func (cache *FileCache) DelLastNode(entry string) {
 	delete(cache.hashmap, entry)
 }
 
+func (cache *FileCache) DeleteNode(entry string) {
+	node, ok := cache.hashmap[entry]
+	if !ok {
+		return
+	}
+	switch cache.entryCount {
+	case 1:
+		cache.Clear()
+		return
+	default:
+		if node == cache.first {
+			cache.first = node.after
+			cache.first.before = nil
+		} else if node == cache.last {
+			cache.last = node.before
+			cache.last.after = nil
+		}
+		tempBefore := node.before
+		tempAfter := node.after
+
+		tempBefore.after = tempAfter
+		tempAfter.before = tempBefore
+
+		node.before = nil
+		node.after = nil
+		clear(node.files)
+		delete(cache.hashmap, entry)
+		cache.entryCount--
+	}
+}
+
 func (cache *FileCache) Add(entry, fileName string) {
 	newEntry := FileCacheNode{
 		key:   entry,
@@ -234,7 +265,7 @@ func (cache *FileCache) Fetch(entry string) []string {
 		finalSlice = append(finalSlice, filePath)
 	}
 
-	//delete cache entry method??
+	cache.DeleteNode(entry)
 
 	return finalSlice
 }
