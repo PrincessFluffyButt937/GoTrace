@@ -13,42 +13,6 @@ import (
 	"github.com/PrincessFluffyButt937/GoTrace/internal/structure"
 )
 
-func (cfg *apiConfig) Scanfolder(rootFilePath string) error {
-	//valid directory check
-	dir, err := os.Stat(rootFilePath)
-	if os.IsNotExist(err) {
-		return fmt.Errorf("Filepath does not exist:\n%s\n", err.Error())
-	}
-	if !dir.IsDir() {
-		return fmt.Errorf("Filepath is not a directory:\n%s\n", err.Error())
-	}
-	//open directory
-	openDir, err := os.Open(rootFilePath)
-	if err != nil {
-		return err
-	}
-	defer openDir.Close()
-
-	//Parses contents of folder (file information)
-	//Full logic yet to be implemented
-
-	for {
-		files, err := openDir.ReadDir(cfg.parseLimit)
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return fmt.Errorf("Folder parsing failed: %s", err.Error())
-		}
-		for _, file := range files {
-			fmt.Println(file.Name())
-		}
-		fmt.Println("------")
-	}
-
-	return nil
-}
-
 //Time parsing start
 
 func parseStringToTime(timeString string) (time.Time, error) {
